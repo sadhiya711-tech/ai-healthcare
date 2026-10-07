@@ -212,13 +212,14 @@ export async function generateDoctorQuestions(report: ReportData): Promise<Docto
 
 export async function askAssistant(
   userQuery: string,
-  reportContext?: ReportData
+  _reportContext?: ReportData
 ): Promise<string> {
-  await new Promise((resolve) => setTimeout(resolve, 700));
+  // Short simulated response delay (600ms) for realistic feel and clear loading state
+  await new Promise((resolve) => setTimeout(resolve, 600));
 
   const lower = userQuery.toLowerCase().trim();
 
-  // Emergency detection
+  // 1. Emergency detection
   if (
     lower.includes('chest pain') ||
     lower.includes('emergency') ||
@@ -232,52 +233,256 @@ export async function askAssistant(
     return '⚠️ IMPORTANT MEDICAL SAFETY NOTICE: If you think you may be experiencing a medical emergency, seek immediate professional medical care or contact your local emergency service (such as 911 or your local emergency department). MediGuide AI cannot provide emergency treatment, diagnoses, or triage.';
   }
 
-  // Medication or prescription questions
+  // 2. High Fever / Fever ("I am getting high fever. What can I do?")
   if (
-    lower.includes('take') && lower.includes('pill') ||
-    lower.includes('dosage') ||
-    lower.includes('prescribe') ||
-    lower.includes('stop taking') ||
-    lower.includes('should i take')
+    lower.includes('fever') ||
+    lower.includes('temperature') ||
+    lower.includes('chills') ||
+    lower.includes('pyrexia')
   ) {
-    return 'MediGuide AI cannot prescribe medication or advise on dosages. Only a licensed physician or pharmacist who knows your complete medical history can prescribe, adjust, or discontinue medications. Please consult your healthcare provider directly before changing any treatment plan.';
+    return `🌡️ High Fever Guidance & Safe Next Steps:
+
+A fever is your body's natural defense mechanism fighting off an infection (such as a viral or bacterial illness). Here are basic, safe steps you can take:
+
+1. Hydration & Fluid Intake:
+• Drink plenty of fluids (water, oral electrolytes, clear broth, or herbal tea) to avoid dehydration caused by increased body heat and sweating.
+
+2. Rest & Comfort Measures:
+• Get plenty of bed rest to allow your immune system to recover.
+• Wear lightweight, breathable cotton clothing and keep your room at a comfortable temperature.
+• You can apply a lukewarm, damp cloth to your forehead or the back of your neck for comfort (avoid ice-cold water or cold baths, as shivering can raise your internal body temperature).
+
+3. Over-the-Counter Options:
+• Common over-the-counter fever reducers (such as acetaminophen/paracetamol or ibuprofen) are frequently used by adults to ease discomfort. Please follow package directions carefully or consult a doctor or pharmacist for appropriate dosing.
+
+🚨 When to Seek Prompt Medical Attention:
+• Your temperature reaches 103°F (39.4°C) or higher, or does not come down after 48–72 hours.
+• You experience warning signs such as a stiff neck, severe headache, confusion, shortness of breath, or persistent vomiting.
+• For infants or very young children, contact a pediatrician promptly.`;
   }
 
-  // Diagnosis questions
+  // 3. Headache / Migraine
   if (
-    lower.includes('do i have diabetes') ||
-    lower.includes('do i have cancer') ||
-    lower.includes('do i have anemia') ||
-    lower.includes('diagnose')
+    lower.includes('headache') ||
+    lower.includes('migraine') ||
+    lower.includes('head ache') ||
+    lower.includes('head hurts') ||
+    lower.includes('head pain')
   ) {
-    return 'MediGuide AI cannot diagnose diseases or medical conditions. A single lab report is just one piece of a puzzle; clinical diagnosis requires a physical exam, clinical context, and professional medical review. For abnormal results: This result is outside the reference range shown on the report. There can be many possible reasons. Discuss this result with a qualified healthcare professional who can interpret it in context.';
+    return `🤕 Headache Information & Relief Guidance:
+
+Headaches are very common and most often triggered by tension, dehydration, eye strain, lack of sleep, or missed meals.
+
+1. Helpful Self-Care Steps:
+• Rest in a quiet, dimly lit, and peaceful room with your eyes closed.
+• Drink a large glass of water—mild dehydration is a very frequent cause of head throbbing.
+• Place a cool gel pack or a warm washcloth across your forehead or back of your neck.
+• Take deep breaths and gently relax your neck and shoulder muscles.
+
+2. Common Triggers to Monitor:
+• Check if prolonged screen time, caffeine withdrawal, stress, or lack of sleep triggered it.
+
+🚨 Warning Signs to Seek Immediate Medical Attention:
+• A sudden, explosive, severe pain ("worst headache of your life" or thunderclap onset).
+• Headache accompanied by high fever, stiff neck, confusion, numbness, or visual disturbances.
+• Headaches that steadily worsen or occur following a head injury.`;
   }
 
-  // Hemoglobin question
-  if (lower.includes('hemoglobin')) {
-    return `Hemoglobin is a protein found inside red blood cells. Think of it as a fleet of delivery vehicles carrying fresh oxygen from your lungs to your muscles, brain, and other vital organs. In this report, the level is 13.8 g/dL, which falls neatly within the standard reference range of 12.0 to 16.0 g/dL.`;
+  // 4. Hemoglobin / Hgb / Red blood cells
+  if (
+    lower.includes('hemoglobin') ||
+    lower.includes('hgb') ||
+    lower.includes('hb') ||
+    lower.includes('red blood cell') ||
+    lower.includes('anemia')
+  ) {
+    return `🩸 What is Hemoglobin?
+
+• Simple Explanation: Hemoglobin is an iron-rich protein packed inside your red blood cells. Think of it as a fleet of microscopic delivery vehicles carrying fresh oxygen from your lungs to your muscles, brain, and all vital organs.
+• Standard Range: Typically 13.8–17.2 g/dL for adult men and 12.1–15.1 g/dL for adult women.
+• In This Report: The hemoglobin level is 13.8 g/dL, which falls neatly within the standard reference range.
+• Why It Matters:
+  - Low hemoglobin (anemia) can make you feel fatigued, weak, or short of breath.
+  - High hemoglobin can occur from dehydration or living at high altitudes.
+
+Discuss your overall complete blood count with your doctor for comprehensive interpretation.`;
   }
 
-  // Glucose question
-  if (lower.includes('glucose') || lower.includes('sugar') || lower.includes('108')) {
-    return `In this report, the Fasting Blood Glucose is 108 mg/dL, while the typical resting reference cutoff is 70 to 99 mg/dL. This is slightly above the standard fasting range. There can be many possible reasons, including what you ate the evening before, how long you fasted, morning stress, or individual metabolic variation. A great question to ask your doctor is: "Should we repeat this test or check an HbA1c to see my longer-term 3-month average?"`;
+  // 5. Blood Sugar / Glucose / Fasting Glucose / Diabetes
+  if (
+    lower.includes('glucose') ||
+    lower.includes('blood sugar') ||
+    lower.includes('sugar') ||
+    lower.includes('fasting glucose') ||
+    lower.includes('108') ||
+    lower.includes('diabetes')
+  ) {
+    return `🍬 Understanding Blood Sugar (Glucose):
+
+• What It Is: Glucose is the primary sugar in your bloodstream. It serves as the immediate fuel powering your body cells, brain, and muscles.
+• Standard Reference Range: A normal fasting blood glucose (tested after not eating for 8–12 hours) is between 70 and 99 mg/dL.
+• In This Report: The fasting glucose result is 108 mg/dL, which is slightly above the standard fasting reference cutoff (100–125 mg/dL is often classified as impaired fasting glucose or pre-diabetes range).
+• What Influences It: Prior evening meals, carbohydrate intake, stress, sleep, or individual metabolism can cause temporary fluctuations.
+• Recommended Next Step: Ask your doctor if they recommend testing an HbA1c (a 3-month blood sugar average) or repeating the fasting test.`;
   }
 
-  // WBC question
-  if (lower.includes('wbc') || lower.includes('white blood')) {
-    return `White blood cells are your body's immune defense patrol. They protect you against bacteria, seasonal colds, and infections. Here, the count is 7,200 cells/µL, well within the usual 4,000 to 11,000 reference bracket.`;
+  // 6. Explain Report / Report Summary / Explain This Result
+  if (
+    lower.includes('explain my report') ||
+    lower.includes('explain the report') ||
+    lower.includes('explain this report') ||
+    lower.includes('explain report') ||
+    lower.includes('explain this result') ||
+    lower.includes('summary') ||
+    lower.includes('review my report') ||
+    lower.includes('what does my report say')
+  ) {
+    return `📋 Simple Breakdown of Your Lab Report:
+
+Here is an easy-to-read overview of your Complete Blood Count (CBC) and Metabolic Panel:
+
+✅ What Looks Healthy (Within Range):
+• Hemoglobin (13.8 g/dL): Healthy red blood cells delivering oxygen efficiently.
+• White Blood Cells (7,200 cells/µL): Your immune system defense patrol is balanced with no signs of acute infection.
+• Platelets (245,000 /µL): Clotting cells are right in the target zone to protect against bleeding.
+
+⚠️ What Deserves Brief Attention:
+• Fasting Blood Glucose (108 mg/dL): Slightly above the standard 99 mg/dL cutoff. Not an emergency, but an ideal talking point with your doctor to review your diet and check your 3-month HbA1c.
+
+💡 Overall Takeaway: Most vital blood indicators are in excellent shape! The slightly elevated fasting glucose is a great starting point for a routine conversation with your doctor.`;
   }
 
-  // Doctor question suggestions
-  if (lower.includes('doctor') || lower.includes('ask') || lower.includes('questions')) {
-    return `Here are 3 great questions you can bring to your appointment:\n1. "What does this slightly elevated glucose result mean in my personal health context?"\n2. "Are there simple nutritional or exercise tweaks you recommend first?"\n3. "Would it be helpful to retest or check an HbA1c in 3 months?"`;
+  // 7. Questions to ask doctor / Doctor questions
+  if (
+    lower.includes('doctor') ||
+    lower.includes('ask') ||
+    lower.includes('question') ||
+    lower.includes('appointment')
+  ) {
+    return `🩺 Great Questions to Bring to Your Next Appointment:
+
+1. "My fasting glucose was slightly elevated at 108 mg/dL. Would you suggest an HbA1c test to check my 3-month average?"
+2. "Are there simple dietary or lifestyle adjustments (like increasing fiber or walking) you recommend for me?"
+3. "Are my other complete blood count numbers (hemoglobin, WBC, platelets) completely stable?"
+4. "When would you like to schedule my next routine check-up or follow-up blood test?"
+
+Tip: You can also use the 'Questions' tab in the left sidebar to generate and copy additional tailored questions!`;
   }
 
-  // General summary request
-  if (lower.includes('explain') || lower.includes('summary') || lower.includes('report')) {
-    return `Overall, this routine Complete Blood Count (CBC) report shows that your oxygen-carrying hemoglobin (13.8 g/dL), immune white blood cells (7,200 cells/µL), and clot-forming platelets (245,000/µL) are all within standard reference ranges. The only item flagged for attention is the Fasting Glucose at 108 mg/dL, which is slightly above 99 mg/dL. It's a wonderful talking point for a quick check-in with your doctor!`;
+  // 8. White Blood Cells (WBC)
+  if (
+    lower.includes('wbc') ||
+    lower.includes('white blood') ||
+    lower.includes('leukocyte')
+  ) {
+    return `🛡️ What Are White Blood Cells (WBC)?
+
+• Simple Analogy: White blood cells are your body’s personal security and immune defense team. They patrol your bloodstream to fend off bacteria, viruses, and foreign invaders.
+• In This Report: 7,200 cells/µL (Standard reference range is 4,000 to 11,000 cells/µL).
+• Meaning: Your count is in the normal reference bracket, indicating no active acute infection or immune suppression in this sample.`;
   }
 
-  // Friendly default
-  return `I'm happy to help explain that in simple terms! Remember, MediGuide AI provides educational explanations to make medical reports easier to read, but does not diagnose or replace your physician. Would you like to explore what a specific lab biomarker means, or generate custom questions for your next doctor's visit?`;
+  // 9. Platelets
+  if (
+    lower.includes('platelet') ||
+    lower.includes('thrombocyte')
+  ) {
+    return `🩹 What Are Platelets?
+
+• Simple Analogy: Platelets are like tiny self-sealing patches. When you get a cut or scrape, platelets rush to stick together and create a clot to stop bleeding.
+• In This Report: 245,000 /µL (Standard reference range is 150,000 to 450,000 /µL).
+• Meaning: Your platelet count is safely in the ideal zone, showing proper blood clotting ability.`;
+  }
+
+  // 10. Cholesterol / Lipid Panel
+  if (
+    lower.includes('cholesterol') ||
+    lower.includes('lipid') ||
+    lower.includes('ldl') ||
+    lower.includes('hdl') ||
+    lower.includes('triglyceride')
+  ) {
+    return `🫀 Understanding Cholesterol & Lipids:
+
+• Total Cholesterol: The overall amount of fatty compounds in your blood. Ideal is generally below 200 mg/dL.
+• LDL ("Bad" Cholesterol): Carries cholesterol to tissues; if elevated (> 100 mg/dL), it can gradually form plaque in arteries.
+• HDL ("Good" Cholesterol): Acts like a clean-up truck, removing excess cholesterol and returning it to the liver for clearance. Higher (> 40–50 mg/dL) is protective.
+• Lifestyle Tips: Soluble fiber (oats, beans), healthy fats (olive oil, nuts), and regular brisk walking support healthy lipid profiles.`;
+  }
+
+  // 11. Blood Pressure / BP
+  if (
+    lower.includes('blood pressure') ||
+    lower.includes('hypertension') ||
+    lower.includes('bp ') ||
+    lower.includes('bp?')
+  ) {
+    return `💓 Understanding Blood Pressure:
+
+• Systolic (Top Number): The pressure in blood vessels when the heart contracts (Ideal: under 120 mm Hg).
+• Diastolic (Bottom Number): The pressure when the heart rests between beats (Ideal: under 80 mm Hg).
+• Healthy Tips: Staying hydrated, reducing excess sodium, managing stress, and regular light cardio exercise help keep blood pressure in a healthy range.`;
+  }
+
+  // 12. Stomach pain / Digestion / Nausea
+  if (
+    lower.includes('stomach') ||
+    lower.includes('nausea') ||
+    lower.includes('vomit') ||
+    lower.includes('tummy') ||
+    lower.includes('belly') ||
+    lower.includes('digestion') ||
+    lower.includes('acid') ||
+    lower.includes('cramp')
+  ) {
+    return `🥣 Digestive & Stomach Discomfort Information:
+
+Stomach upset is frequently caused by indigestion, food sensitivity, mild viral gastroenteritis, or stress.
+
+1. Safe Self-Care:
+• Sip fluids slowly (water, clear broths, oral electrolytes, or ginger/peppermint tea) to stay hydrated.
+• Stick to bland, easily digestible foods (such as rice, toast, oatmeal, or bananas) once nausea subsides.
+• Avoid heavy, spicy, or fried foods.
+
+🚨 When to Seek Medical Attention:
+• Severe, sudden abdominal pain.
+• High fever, inability to keep liquids down for 24 hours, or blood in stool or vomit.`;
+  }
+
+  // 13. Cough / Cold / Sore Throat
+  if (
+    lower.includes('cough') ||
+    lower.includes('cold') ||
+    lower.includes('sore throat') ||
+    lower.includes('flu') ||
+    lower.includes('sneez') ||
+    lower.includes('congestion')
+  ) {
+    return `🍵 Cold, Cough & Sore Throat Care:
+
+Most common upper respiratory symptoms are caused by seasonal viruses that resolve with supportive care:
+
+• Hydration: Drink plenty of warm liquids (warm water, herbal teas with honey, or broths).
+• Throat Relief: Gargle with warm salt water (1/2 teaspoon of salt in warm water) several times a day.
+• Air Moisture: Use a cool-mist humidifier or breathe in steam from a warm shower to relieve nasal irritation.
+• Rest: Give your body time to sleep and recover.
+
+🚨 Seek Medical Attention If:
+• You experience shortness of breath, wheezing, high fever lasting more than 3 days, or severe difficulty swallowing fluids.`;
+  }
+
+  // 14. Friendly, Helpful Healthcare General Fallback
+  return `💬 MediGuide AI Health Information:
+
+I'm here to help explain your lab results, health symptoms, and medical terminology in clear, everyday language!
+
+Here are common topics you can ask me about:
+• "I am getting high fever, what can I do?"
+• "I have a headache, what could be the cause?"
+• "Explain my report simply"
+• "What does hemoglobin mean?"
+• "Why was my fasting glucose 108?"
+• "What questions should I ask my doctor?"
+
+Feel free to ask any specific question about your health or report!`;
 }

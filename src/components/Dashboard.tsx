@@ -1087,7 +1087,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   <div className="flex justify-start">
                     <div className="bg-white border border-slate-200 rounded-2xl p-3 text-xs text-slate-500 flex items-center gap-2 shadow-2xs">
                       <div className="w-2 h-2 rounded-full bg-teal-600 animate-ping" />
-                      <span>MediGuide is simplifying an explanation...</span>
+                      <span>MediGuide AI is thinking...</span>
                     </div>
                   </div>
                 )}
@@ -1102,13 +1102,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 <div className="flex items-center gap-1.5 flex-wrap">
                   {[
                     'Explain my report simply',
+                    'I am getting high fever, what can I do?',
                     'What does hemoglobin mean?',
                     'What should I ask my doctor?',
-                    'Explain this result',
                     'Why was fasting glucose 108?'
                   ].map((chip) => (
                     <button
                       key={chip}
+                      type="button"
                       onClick={() => handleSendChat(chip)}
                       className="text-xs px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-lg transition-colors cursor-pointer"
                     >
@@ -1130,6 +1131,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   type="text"
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendChat();
+                    }
+                  }}
                   placeholder="Ask any question about your report or medical words..."
                   className="w-full pl-4 pr-24 py-3.5 bg-white border border-slate-300 rounded-2xl text-sm focus:outline-hidden focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-xs text-slate-900"
                 />
