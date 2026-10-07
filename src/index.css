@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+}
+
+/* Easy Read Mode styling for seniors and high-accessibility needs */
+html.easy-read-mode {
+  font-size: 110%;
+  letter-spacing: 0.015em;
+}
+
+html.easy-read-mode p,
+html.easy-read-mode li,
+html.easy-read-mode span {
+  line-height: 1.75;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

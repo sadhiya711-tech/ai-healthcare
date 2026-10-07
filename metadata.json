@@ -1,0 +1,6 @@
+{
+  "name": "MediGuide AI",
+  "description": "Understand your health information, simply. AI-powered medical report simplifier, lab test explanations, and doctor question generator.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
